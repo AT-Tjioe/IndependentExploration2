@@ -1,0 +1,224 @@
+1. Missing comma in `fill()`
+
+```javascript
+fill(0, 255 0);
+```
+
+**Problem:**
+There's a missing comma between `255` and `0`.
+
+**Correct:**
+
+```javascript
+fill(0, 255, 0);
+```
+
+---
+
+2. Incorrect `rect()` parameters for the ball
+
+```javascript
+rect(30, xPos, yPos);
+```
+
+**Problem:**
+`rect()` expects:
+
+```javascript
+rect(x, y, width, height);
+```
+
+Your code is using:
+
+* `30` as the x-position
+* `xPos` as the y-position
+* `yPos` as the width
+* no height at all
+
+This means the ball won't appear where you expect.
+
+**Correct:**
+If you want a 30×30 ball (actually a square):
+
+```javascript
+rect(xPos, yPos, 30, 30);
+```
+
+---
+
+3. Score never increases
+
+```javascript
+score;
+```
+
+**Problem:**
+This line does nothing. It simply references the variable.
+
+**Correct:**
+
+```javascript
+score++;
+```
+
+or
+
+```javascript
+score += 1;
+```
+
+---
+
+4. Incorrect goal detection logic
+
+```javascript
+if (xPos + 15 <= 220 && xPos - 15 <= 280 && yPos + 15 >= 480)
+```
+
+**Problem:**
+The first condition is backwards.
+
+You're checking:
+
+```javascript
+xPos + 15 <= 220
+```
+
+That means the **right side** of the ball must be left of the goal, which is probably not what you intended.
+
+Since your goal is centered at `250` with width `60`, its edges are:
+
+* left = `220`
+* right = `280`
+
+To detect overlap:
+
+```javascript
+xPos + 15 >= 220 &&
+xPos - 15 <= 280 &&
+yPos + 15 >= 480
+```
+
+This checks that the ball overlaps the goal horizontally.
+
+---
+
+5. Score text is drawn in the corner
+
+```javascript
+text("Score: " + score, 0, 0)
+```
+
+**Problem:**
+The coordinates `(0,0)` are on the very edge of the canvas, so most of the text may not be visible.
+
+**Better:**
+
+```javascript
+text("Score: " + score, 10, 25);
+```
+
+---
+
+6. Possible zero horizontal speed
+
+```javascript
+xSpeed = random(-5, 5);
+```
+
+This isn't an error, but `random(-5,5)` could return something very close to `0`, making the ball barely move sideways.
+
+If you always want noticeable movement, you could do something like:
+
+```javascript
+xSpeed = random([-5, -4, -3, -2, 2, 3, 4, 5]);
+```
+
+---
+
+7. Ball wraps off-screen
+
+```javascript
+if (xPos < 0) {
+    xPos = 500;
+}
+```
+
+Since your ball is 30 pixels wide, half of it disappears before wrapping.
+
+A smoother wrap would be:
+
+```javascript
+if (xPos < -15) {
+    xPos = 515;
+}
+if (xPos > 515) {
+    xPos = -15;
+}
+```
+
+---
+
+8. Ball shape
+
+You're drawing the "ball" with:
+
+```javascript
+rect(...)
+```
+
+If you actually want a ball, use:
+
+```javascript
+circle(xPos, yPos, 30);
+```
+
+or
+
+```javascript
+ellipse(xPos, yPos, 30, 30);
+```
+
+---
+
+Corrected sections
+
+```javascript
+// draw goal
+fill(0, 255, 0);
+rect(250, 490, 60, 20);
+
+// draw ball
+fill(255, 0, 255);
+rect(xPos, yPos, 30, 30);
+
+// draw score
+fill(18);
+textSize(20);
+text("Score: " + score, 10, 25);
+
+// check if in goal
+if (
+    xPos + 15 >= 220 &&
+    xPos - 15 <= 280 &&
+    yPos + 15 >= 480
+) {
+    score++;
+
+    xPos = random(15, 485);
+    yPos = 0;
+    xSpeed = random(-5, 5);
+    ySpeed = random(0, 10);
+}
+```
+
+Summary of issues
+
+* ❌ Missing comma in `fill(0, 255, 0)`.
+* ❌ Incorrect `rect()` arguments for the ball.
+* ❌ `score;` does nothing; it should be `score++;`.
+* ❌ Goal collision condition uses the wrong comparison for the left edge.
+* ⚠️ Score text is placed at `(0,0)` where it may be clipped.
+* ⚠️ `xSpeed` can be nearly zero, making sideways movement minimal.
+* ⚠️ Wrapping doesn't account for the ball's size.
+* 💡 If the object is meant to be a ball, `circle()` or `ellipse()` is more appropriate than `rect()`.

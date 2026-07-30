@@ -1,0 +1,237 @@
+1. Syntax error in `line()`
+
+Your code:
+
+```javascript
+line(600, 0 600, 300);
+```
+
+**Problem:**
+There's a missing comma between `0` and `600`.
+
+**Correct:**
+
+```javascript
+line(600, 0, 600, 300);
+```
+
+Without the comma, the program won't run.
+
+---
+
+2. Incorrect score positions
+
+Your code:
+
+```javascript
+text(redScore, 800, 100);
+text(blueScore, 800, 225);
+```
+
+**Problem:**
+Your canvas width is `800`, so an x-coordinate of `800` places the text on the very edge of the canvas, where it may be partially or completely off-screen.
+
+**Better:**
+
+```javascript
+text(redScore, 720, 100);
+text(blueScore, 720, 225);
+```
+
+---
+
+3. Incorrect `ellipse()` arguments
+
+Your code:
+
+```javascript
+ellipse(50, 50, redXPos, redYPos);
+```
+
+**Problem:**
+The parameters for `ellipse()` are:
+
+```javascript
+ellipse(x, y, width, height);
+```
+
+Your code is using:
+
+* `50, 50` as the position
+* `redXPos` and `redYPos` as the size
+
+This means the ball stays fixed at `(50, 50)` while getting larger and larger.
+
+**Correct:**
+
+```javascript
+ellipse(redXPos, redYPos, 50, 50);
+```
+
+Similarly, change:
+
+```javascript
+ellipse(50, 50, blueXPos, blueYPos);
+```
+
+to
+
+```javascript
+ellipse(blueXPos, blueYPos, 50, 50);
+```
+
+---
+
+4. Finish-line condition is backwards
+
+Your code:
+
+```javascript
+if (redXPos < 575 || blueXPos < 575)
+```
+
+**Problem:**
+The balls start at `25`, so this condition is **true immediately** because both positions are less than `575`.
+
+The race resets every frame.
+
+**Correct:**
+
+```javascript
+if (redXPos > 575 || blueXPos > 575)
+```
+
+This checks whether either ball has crossed the finish line.
+
+---
+
+5. Winner comments don't match the code
+
+Your code:
+
+```javascript
+if (redXPos > blueXPos) {
+    // blue wins
+    redScore += 1;
+}
+```
+
+**Problem:**
+If `redXPos` is greater than `blueXPos`, then the **red** ball is ahead, not the blue one.
+
+The comment should be:
+
+```javascript
+// red wins
+```
+
+Similarly:
+
+```javascript
+else if (blueXPos > redXPos) {
+    // red wins
+    blueScore = 1;
+}
+```
+
+should be:
+
+```javascript
+// blue wins
+```
+
+---
+
+6. Blue score is assigned instead of incremented
+
+Your code:
+
+```javascript
+blueScore = 1;
+```
+
+**Problem:**
+This sets the blue score to `1` every time it wins.
+
+It never reaches `2`, `3`, or higher.
+
+**Correct:**
+
+```javascript
+blueScore += 1;
+```
+
+or
+
+```javascript
+blueScore++;
+```
+
+---
+
+7. Finish line position
+
+You draw the finish line at:
+
+```javascript
+x = 600
+```
+
+but check
+
+```javascript
+> 575
+```
+
+This isn't necessarily wrong because the balls have a radius, but many beginners simply check:
+
+```javascript
+if (redXPos >= 600 || blueXPos >= 600)
+```
+
+or account for the ball's radius if they want the front edge of the ball to count.
+
+---
+
+Corrected versions of the main sections
+
+```javascript
+// show finish line
+line(600, 0, 600, 300);
+
+// red ball
+fill(255, 0, 0);
+ellipse(redXPos, redYPos, 50, 50);
+
+// blue ball
+fill(0, 0, 255);
+ellipse(blueXPos, blueYPos, 50, 50);
+
+// crossed finish line
+if (redXPos > 575 || blueXPos > 575) {
+    if (redXPos > blueXPos) {
+        // red wins
+        redScore++;
+    } else if (blueXPos > redXPos) {
+        // blue wins
+        blueScore++;
+    }
+
+    redXPos = 25;
+    redYPos = 100;
+    blueXPos = 25;
+    blueYPos = 200;
+}
+```
+
+Summary of mistakes
+
+| Mistake                               | Explanation                                                               | Fix                                                 |
+| ------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------- |
+| `line(600, 0 600, 300)`               | Missing comma causes a syntax error.                                      | `line(600, 0, 600, 300)`                            |
+| `ellipse(50, 50, redXPos, redYPos)`   | Uses the position values as the ellipse's width and height.               | `ellipse(redXPos, redYPos, 50, 50)`                 |
+| `ellipse(50, 50, blueXPos, blueYPos)` | Same issue as above.                                                      | `ellipse(blueXPos, blueYPos, 50, 50)`               |
+| `redXPos < 575` / `blueXPos < 575`    | The condition is true at the start of the race, so it resets immediately. | Use `>` or `>=` to detect crossing the finish line. |
+| Winner comments                       | The comments identify the wrong winner.                                   | Swap the comments.                                  |
+| `blueScore = 1`                       | Resets the score to 1 instead of adding a point.                          | Use `blueScore++;` or `blueScore += 1;`             |
+| `text(..., 800, ...)`                 | Text is drawn on the edge of the canvas and may be clipped.               | Move it slightly left, e.g. `720`.                  |

@@ -1,0 +1,81 @@
+javascript
+// number of seconds that have passed
+let time = 0;
+
+// reference to the <span> containing the number
+let counterElement = document.getElementById("time");
+```
+
+1. `document.getElementById("time")` requires an HTML element
+
+This line looks for an HTML element with the ID `"time"`.
+
+For example, your HTML should contain something like:
+
+```html
+<span id="time">0</span>
+```
+
+If there is **no element** with that ID, then:
+
+```javascript
+counterElement
+```
+
+will be `null`, and trying to do something like:
+
+```javascript
+counterElement.innerHTML = time;
+```
+
+will cause an error:
+
+```
+TypeError: Cannot set properties of null
+```
+
+---
+
+2. The script must run after the HTML element exists
+
+Even if you have:
+
+```html
+<span id="time"></span>
+```
+
+your JavaScript can still return `null` if it runs **before** the browser has created that element.
+
+For example, this can happen if your script is placed in the `<head>` without waiting for the page to load.
+
+A common solution is to put the script just before the closing `</body>` tag:
+
+```html
+<body>
+    <span id="time">0</span>
+
+    <script src="script.js"></script>
+</body>
+```
+
+or wait until the page has loaded before accessing the element.
+
+---
+
+3. The variables aren't used yet
+
+Right now you've only:
+
+* created a variable called `time`
+* stored a reference to an HTML element
+
+Nothing in this snippet actually **updates** the timer or displays a changing value. You'll need additional code, such as incrementing `time` and updating the element's text.
+
+For example:
+
+```javascript
+time++;
+counterElement.textContent = time;
+```
+
+---
